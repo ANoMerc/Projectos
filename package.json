@@ -1,0 +1,103 @@
+{
+  "name": "projectos",
+  "version": "1.0.0",
+  "description": "ProjectOS — система управления проектами с SEMATIC, PERT и Kanban",
+  "private": true,
+  "main": "dist-electron/main.js",
+  "scripts": {
+    "dev":             "vite",
+    "build":           "tsc && vite build",
+    "preview":         "vite preview",
+    "lint":            "eslint src --ext ts,tsx --report-unused-disable-directives --max-warnings 0",
+
+    "electron:compile": "tsc --project electron/tsconfig.json",
+    "electron:dev":    "concurrently -k \"pnpm dev\" \"wait-on http://localhost:3000 && electron .\"",
+    "electron:build":  "pnpm build && pnpm electron:compile && pnpm electron:pack",
+    "electron:pack":   "electron-builder",
+
+    "dist:win":        "pnpm electron:build -- --win",
+    "dist:mac":        "pnpm electron:build -- --mac",
+    "dist:all":        "pnpm electron:build -- --win --mac"
+  },
+  "dependencies": {
+    "react":            "^18.3.1",
+    "react-dom":        "^18.3.1",
+    "react-router-dom": "^6.26.1",
+    "zustand":          "^4.5.4",
+    "recharts":         "^2.12.7",
+    "date-fns":         "^3.6.0"
+  },
+  "devDependencies": {
+    "@types/react":     "^18.3.3",
+    "@types/react-dom": "^18.3.0",
+    "@vitejs/plugin-react": "^4.3.1",
+    "typescript":       "^5.5.3",
+    "vite":             "^5.4.2",
+    "eslint":           "^9.9.0",
+    "@typescript-eslint/eslint-plugin": "^8.0.1",
+    "@typescript-eslint/parser":        "^8.0.1",
+
+    "electron":         "^31.3.1",
+    "electron-builder": "^24.13.3",
+    "concurrently":     "^8.2.2",
+    "wait-on":          "^7.2.0"
+  },
+  "build": {
+    "appId":       "io.projectos.app",
+    "productName": "ProjectOS",
+    "copyright":   "© 2025 ProjectOS Team",
+    "asar":        true,
+    "directories": {
+      "output": "release"
+    },
+    "files": [
+      "dist/**/*",
+      "dist-electron/**/*",
+      "public/**/*"
+    ],
+    "extraResources": [
+      { "from": "public/icon.png", "to": "icon.png" }
+    ],
+    "win": {
+      "target": [
+        { "target": "nsis",     "arch": ["x64"] },
+        { "target": "portable", "arch": ["x64"] }
+      ],
+      "icon": "public/icon.ico",
+      "artifactName": "ProjectOS-Setup-${version}.${ext}"
+    },
+    "nsis": {
+      "oneClick":           false,
+      "allowToChangeInstallationDirectory": true,
+      "createDesktopShortcut": true,
+      "createStartMenuShortcut": true,
+      "shortcutName":       "ProjectOS",
+      "installerIcon":      "public/icon.ico",
+      "uninstallerIcon":    "public/icon.ico",
+      "installerHeaderIcon":"public/icon.ico",
+      "language":           "1049"
+    },
+    "mac": {
+      "target": [
+        { "target": "dmg", "arch": ["x64", "arm64"] },
+        { "target": "zip", "arch": ["x64", "arm64"] }
+      ],
+      "icon":     "public/icon.icns",
+      "category": "public.app-category.productivity",
+      "artifactName": "ProjectOS-${version}-mac.${ext}",
+      "hardenedRuntime":   true,
+      "gatekeeperAssess":  false,
+      "entitlements":             "build/entitlements.mac.plist",
+      "entitlementsInherit":      "build/entitlements.mac.plist"
+    },
+    "dmg": {
+      "title":       "ProjectOS ${version}",
+      "background":  "build/dmg-background.png",
+      "window":      { "width": 600, "height": 400 },
+      "contents": [
+        { "x": 150, "y": 180, "type": "file"    },
+        { "x": 450, "y": 180, "type": "link", "path": "/Applications" }
+      ]
+    }
+  }
+}
